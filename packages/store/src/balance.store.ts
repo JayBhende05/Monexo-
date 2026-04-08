@@ -14,3 +14,6 @@ export const balanceStore = create<Bal>((set) =>({
     set((state) => ({balance : state.balance - 1 }))
 
 }))
+
+
+

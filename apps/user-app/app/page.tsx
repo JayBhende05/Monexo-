@@ -1,9 +1,18 @@
 
 
 
+import { useSession } from "next-auth/react";
 import Navbar from "../component/Navbar";
 
 export default async function Page() {
+
+  // const {data: session , status} = useSession();
+
+  // useEffect(()=>{
+  //   if(status === 'authenticated'){
+
+  //   }
+  // })
  
   //  const user = await prisma.user.findMany();
   return <>
