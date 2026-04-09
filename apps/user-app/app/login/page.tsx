@@ -32,7 +32,7 @@ function page() {
   if (res?.error) {
       setError("Invalid credentials")
     } else {
-      router.push("/") // Redirect after login
+      router.push("/dashboard") // Redirect after login
     }
 
     console.log("Logging in with:", phone, password);
