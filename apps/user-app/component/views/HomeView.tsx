@@ -6,6 +6,7 @@ import { cn } from "./../../lib/utils";
 import { useSession } from "next-auth/react";
 import getGreeting from "../../lib/greeting";
 import {useState, useEffect} from 'react'
+import { useAmountBalanceStore } from "@repo/store";
 
 const data = [
   { date: "20 Feb", value: 0 },
@@ -18,6 +19,8 @@ const data = [
 export default function HomeView() {
   const {data: session, status} = useSession();
   const[greetingMsg, setGreetingMsg] = useState('Good to see you back')
+      const { amountBalance } = useAmountBalanceStore();
+  
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -40,7 +43,7 @@ export default function HomeView() {
           <div className="mb-8">
             <p className="text-sm font-medium text-gray-500 mb-1">Portfolio value</p>
             <div className="flex items-baseline gap-3">
-              <h2 className="text-5xl font-bold text-gray-900">$12,450.00</h2>
+              <h2 className="text-5xl font-bold text-gray-900">{amountBalance / 100}</h2>
               <span className="text-brand-accent font-semibold flex items-center gap-1">
                 <TrendingUp className="w-4 h-4" />
                 +2.4%

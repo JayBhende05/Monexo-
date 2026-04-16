@@ -1,26 +1,162 @@
-import { Download, ChevronDown, Search, Filter, Calendar } from "lucide-react";
+// import { Download, ChevronDown, Search, Filter, Calendar } from "lucide-react";
+// import { cn } from "./../../lib/utils";
+// import { useTransactionStore } from "@repo/store";
+
+
+// const transactions = [
+//   { id: 1, type: "Withdrew USDC", date: "Feb 19, 2024, 03:18", amount: "-5,059.9477 USDC", value: "-$5,060.36", icon: "S" },
+//   { id: 2, type: "Converted to USDC", date: "Feb 19, 2024, 03:17", amount: "+5,059.9477 USDC", value: "-704.0000 DYM", icon: "S" },
+//   { id: 3, type: "Deposited ETH", date: "Feb 15, 2024, 12:45", amount: "+1.5000 ETH", value: "$3,450.20", icon: "E" },
+//   { id: 4, type: "Buy BTC", date: "Feb 12, 2024, 09:12", amount: "+0.0500 BTC", value: "-$2,150.00", icon: "B" },
+// ];
+
+// export default function TransactionsView() {
+//  const transactions = useTransactionStore((s) => s.transactions);
+//   return (
+//     <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
+//       <h1 className="text-4xl font-bold text-gray-900">Transactions</h1>
+
+//       <div className="flex gap-4 mb-8">
+//         {["History", "Scheduled"].map((tab) => (
+//           <button
+//             key={tab}
+//             className={cn(
+//               "px-6 py-2 rounded-full text-sm font-bold transition-all",
+//               tab === "History" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+//             )}
+//           >
+//             {tab}
+//           </button>
+//         ))}
+//       </div>
+
+//       <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm">
+//         <div className="flex items-center justify-between mb-8">
+//           <h3 className="text-xl font-bold text-gray-900">Transactions</h3>
+//           <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition-colors">
+//             <Download className="w-4 h-4" />
+//             Export
+//           </button>
+//         </div>
+
+//         <div className="flex flex-wrap gap-3 mb-8">
+//           <FilterButton label="Assets" />
+//           <FilterButton label="Types" />
+//           <FilterButton label="Start date" icon={Calendar} />
+//           <FilterButton label="End date" icon={Calendar} />
+//           <button className="px-4 py-2 text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors">
+//             Clear
+//           </button>
+//         </div>
+
+//         <div className="space-y-2">
+//           {transactions?.map((tx) => (
+//             <div key={tx.id} className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-2xl transition-all cursor-pointer group">
+//               <div className="flex items-center gap-4">
+//                 <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-500 font-bold shadow-inner">
+//                   {tx.icon}
+//                 </div>
+//                 <div>
+//                   <p className="font-bold text-gray-900 group-hover:text-blue-500 transition-colors">{tx.type}</p>
+//                   <p className="text-xs text-gray-500">{tx.date}</p>
+//                 </div>
+//               </div>
+//               <div className="text-right">
+//                 {/* <p className={cn("font-bold text-gray-900", tx.amount.startsWith("+") ? "text-brand-accent" : "")}>
+//                   {tx.amount}
+//                 </p> */}
+//                 <p className={cn("font-bold text-gray-900")}>
+//                   {tx.amount}
+//                 </p>
+//                 <p className="text-xs text-gray-500">{tx.value}</p>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+        
+//         <div className="mt-8 pt-8 border-t border-gray-100 flex justify-center">
+//           <button className="text-sm font-bold text-blue-500 hover:underline">
+//             Load more transactions
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+import { Download, Calendar, RefreshCw, ChevronDown } from "lucide-react";
 import { cn } from "./../../lib/utils";
+import { useTransactionStore } from "@repo/store";
 
+// 🔹 Helpers
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+  }).format(amount);
+};
 
-const transactions = [
-  { id: 1, type: "Withdrew USDC", date: "Feb 19, 2024, 03:18", amount: "-5,059.9477 USDC", value: "-$5,060.36", icon: "S" },
-  { id: 2, type: "Converted to USDC", date: "Feb 19, 2024, 03:17", amount: "+5,059.9477 USDC", value: "-704.0000 DYM", icon: "S" },
-  { id: 3, type: "Deposited ETH", date: "Feb 15, 2024, 12:45", amount: "+1.5000 ETH", value: "$3,450.20", icon: "E" },
-  { id: 4, type: "Buy BTC", date: "Feb 12, 2024, 09:12", amount: "+0.0500 BTC", value: "-$2,150.00", icon: "B" },
-];
+const formatDate = (date) => {
+  return new Date(date).toLocaleString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const getAmountStyle = (type) => {
+  if (type?.toLowerCase() === "deposit") {
+    return "text-green-600";
+  }
+  if (type?.toLowerCase() === "withdrawal") {
+    return "text-red-500";
+  }
+  return "text-gray-900";
+};
+
+const getAmountPrefix = (type) => {
+  if (type?.toLowerCase() === "deposit") return "+";
+  if (type?.toLowerCase() === "withdrawal") return "−";
+  return "";
+};
+
+const getStatusStyle = (status) => {
+  switch (status?.toLowerCase()) {
+    case "success":
+      return "text-green-600 bg-green-50";
+    case "failed":
+      return "text-red-500 bg-red-50";
+    case "pending":
+      return "text-yellow-600 bg-yellow-50";
+    default:
+      return "text-gray-500 bg-gray-100";
+  }
+};
 
 export default function TransactionsView() {
+  const transactions = useTransactionStore((s) => s.transactions);
+  const refreshTransactions = useTransactionStore((s) => s.fetchTransactions); // 👈 make sure this exists
+
   return (
     <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
       <h1 className="text-4xl font-bold text-gray-900">Transactions</h1>
 
+      {/* Tabs */}
       <div className="flex gap-4 mb-8">
-        {["History", "Scheduled"].map((tab) => (
+        {["History", ""].map((tab) => (
           <button
             key={tab}
             className={cn(
               "px-6 py-2 rounded-full text-sm font-bold transition-all",
-              tab === "History" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+              tab === "History"
+                ? "bg-white shadow-sm text-gray-900"
+                : "text-gray-500 hover:text-gray-700"
             )}
           >
             {tab}
@@ -29,15 +165,31 @@ export default function TransactionsView() {
       </div>
 
       <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm">
+        
+        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-xl font-bold text-gray-900">Transactions</h3>
-          <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition-colors">
-            <Download className="w-4 h-4" />
-            Export
-          </button>
+
+          <div className="flex gap-3">
+            {/* 🔄 Refresh Button */}
+            <button
+              onClick={refreshTransactions}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </button>
+
+            {/* Export */}
+            {/* <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition-colors">
+              <Download className="w-4 h-4" />
+              Export
+            </button> */}
+          </div>
         </div>
 
-        <div className="flex flex-wrap gap-3 mb-8">
+        {/* Filters */}
+        {/* <div className="flex flex-wrap gap-3 mb-8">
           <FilterButton label="Assets" />
           <FilterButton label="Types" />
           <FilterButton label="Start date" icon={Calendar} />
@@ -45,30 +197,62 @@ export default function TransactionsView() {
           <button className="px-4 py-2 text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors">
             Clear
           </button>
+        </div> */}
+
+        {/* Transactions List */}
+        <div className="space-y-2">
+          {transactions?.map((tx, index) => {
+            const prefix = getAmountPrefix(tx.type);
+
+            return (
+              <div
+                key={index}
+                className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-2xl transition-all cursor-pointer group"
+              >
+                {/* Left */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-500 font-bold shadow-inner">
+                    {tx.type?.charAt(0)}
+                  </div>
+
+                  <div>
+                    <p className="font-bold text-gray-900 group-hover:text-blue-500 transition-colors capitalize">
+                      {tx.type}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {formatDate(tx.time)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right */}
+                <div className="text-right space-y-1">
+                  {/* Amount */}
+                  <p
+                    className={cn(
+                      "font-bold",
+                      getAmountStyle(tx.type)
+                    )}
+                  >
+                    {prefix} {formatCurrency(tx.amount)}
+                  </p>
+
+                  {/* Status */}
+                  <span
+                    className={cn(
+                      "text-xs px-2 py-1 rounded-full font-semibold",
+                      getStatusStyle(tx.status)
+                    )}
+                  >
+                    {tx.status}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        <div className="space-y-2">
-          {transactions.map((tx) => (
-            <div key={tx.id} className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-2xl transition-all cursor-pointer group">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-500 font-bold shadow-inner">
-                  {tx.icon}
-                </div>
-                <div>
-                  <p className="font-bold text-gray-900 group-hover:text-blue-500 transition-colors">{tx.type}</p>
-                  <p className="text-xs text-gray-500">{tx.date}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className={cn("font-bold text-gray-900", tx.amount.startsWith("+") ? "text-brand-accent" : "")}>
-                  {tx.amount}
-                </p>
-                <p className="text-xs text-gray-500">{tx.value}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        
+        {/* Load More */}
         <div className="mt-8 pt-8 border-t border-gray-100 flex justify-center">
           <button className="text-sm font-bold text-blue-500 hover:underline">
             Load more transactions

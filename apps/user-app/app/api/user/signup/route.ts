@@ -45,6 +45,14 @@ export async function POST(req: Request) {
       }
     });
 
+    const bal = await prisma.balance.create({
+      data:{
+        amount : 0,
+        locked : 0,
+        userId : user?.id
+      }
+    })
+
     return NextResponse.json(
       {
         message: "User successfully created",
