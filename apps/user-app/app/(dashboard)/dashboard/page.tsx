@@ -43,6 +43,8 @@ export default function App() {
 
 
       
+
+      
       setAmountBalance(balance?.amount);
       setLockedBalance(balance?.locked);
       setTransactions(transactions)
