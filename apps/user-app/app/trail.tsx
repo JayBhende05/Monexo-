@@ -6,6 +6,8 @@ export default function BalanceClient() {
    const {balance, increase} = balanceStore((state) => state )
     
   return (<><p>{balance}</p>
+
+  
   <button onClick={increase} > Increment</button>
   
   
